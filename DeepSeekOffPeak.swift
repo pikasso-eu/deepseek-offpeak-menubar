@@ -2072,19 +2072,33 @@ enum SelfTest {
           {"currency":"USD","total_balance":"12.34","granted_balance":"2.00","topped_up_balance":"10.34"},
           {"currency":"CNY","total_balance":"88.50","granted_balance":"0.00","topped_up_balance":"88.50"}]}
         """
+
         do {
-            let decoded = try JSONDecoder().decode(BalanceResponse.self, from: Data(sample.utf8))
+            let oldLanguage = L.language
+            L.language = "de"
+            defer { L.language = oldLanguage }
+
+            let decoded = try JSONDecoder().decode(
+                BalanceResponse.self,
+                from: Data(sample.utf8)
+            )
+
             let first = decoded.balance_infos[0]
             let total = Double(first.total_balance) ?? 0
+
             let checks = decoded.is_available
                 && decoded.balance_infos.count == 2
                 && first.total_balance == "12.34"
                 && Fmt.money(total, currency: "USD") == "12,34 $"
                 && Fmt.moneyCompact(total, currency: "USD") == "12,34$"
-                && Fmt.moneyCompact(Double(first.granted_balance) ?? 0, currency: "USD") == "2$"
+                && Fmt.moneyCompact(
+                    Double(first.granted_balance) ?? 0,
+                    currency: "USD"
+                ) == "2$"
                 && Fmt.moneyCompact(88.5, currency: "CNY") == "88,5¥"
+
             if checks {
-                print("PASS balance decoding + money format (\(Fmt.money(total, currency: first.currency)) / \(Fmt.moneyCompact(total, currency: first.currency)))")
+                print("PASS balance decoding + money format")
             } else {
                 print("FAIL balance decoding or money format")
                 ok = false
