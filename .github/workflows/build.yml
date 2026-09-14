@@ -1,0 +1,43 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & self test
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build universal app
+        run: ./build.sh
+
+      - name: Locate binary
+        id: bin
+        run: echo "path=build/DeepSeekOffPeak.app/Contents/MacOS/DeepSeekOffPeak" >> "$GITHUB_OUTPUT"
+
+      - name: Run self test
+        run: '"${{ steps.bin.outputs.path }}" --selftest'
+
+      - name: Status line
+        run: '"${{ steps.bin.outputs.path }}" --text'
+
+      - name: German status line
+        run: |
+          mkdir -p "$HOME/Library/Application Support/DeepSeekOffPeak"
+          echo '{"language":"de"}' > "$HOME/Library/Application Support/DeepSeekOffPeak/config.json"
+          "${{ steps.bin.outputs.path }}" --text
+
+      - name: Verify bundle architectures
+        run: lipo -archs build/DeepSeekOffPeak.app/Contents/MacOS/DeepSeekOffPeak
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepSeekOffPeak.app
+          path: build/DeepSeekOffPeak.app
+          if-no-files-found: error

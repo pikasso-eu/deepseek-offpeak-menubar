@@ -1,0 +1,9 @@
+# Build output
+build/
+
+# macOS
+.DS_Store
+
+# Local tooling
+.loc_*.py
+.loc_keys.txt
