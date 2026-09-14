@@ -2073,9 +2073,9 @@ enum SelfTest {
           {"currency":"CNY","total_balance":"88.50","granted_balance":"0.00","topped_up_balance":"88.50"}]}
         """
 
-        let decoded = try JSONDecoder().decod
-        let decoded = try JSONDecoder().decod
+        let oldLanguage = L.language
         L.configure(language: "de")
+        defer { L.configure(language: oldLanguage) }
 
         do {
             let decoded = try JSONDecoder().decode(BalanceResponse.self, from: Data(sample.utf8))
