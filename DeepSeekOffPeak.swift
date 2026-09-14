@@ -2073,17 +2073,14 @@ enum SelfTest {
           {"currency":"CNY","total_balance":"88.50","granted_balance":"0.00","topped_up_balance":"88.50"}]}
         """
 
+        let decoded = try JSONDecoder().decod
+        let decoded = try JSONDecoder().decod
+        L.configure(language: "de")
+
         do {
-            let oldLanguage = L.language
-            L.language = "de"
-            defer { L.language = oldLanguage }
-
-            let decoded = try JSONDecoder().decode(
-                BalanceResponse.self,
-                from: Data(sample.utf8)
-            )
-
+            let decoded = try JSONDecoder().decode(BalanceResponse.self, from: Data(sample.utf8))
             let first = decoded.balance_infos[0]
+
             let total = Double(first.total_balance) ?? 0
 
             let checks = decoded.is_available
@@ -2091,10 +2088,7 @@ enum SelfTest {
                 && first.total_balance == "12.34"
                 && Fmt.money(total, currency: "USD") == "12,34 $"
                 && Fmt.moneyCompact(total, currency: "USD") == "12,34$"
-                && Fmt.moneyCompact(
-                    Double(first.granted_balance) ?? 0,
-                    currency: "USD"
-                ) == "2$"
+                && Fmt.moneyCompact(Double(first.granted_balance) ?? 0, currency: "USD") == "2$"
                 && Fmt.moneyCompact(88.5, currency: "CNY") == "88,5¥"
 
             if checks {
