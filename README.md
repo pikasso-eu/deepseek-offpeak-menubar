@@ -57,6 +57,38 @@ open build/DeepSeekOffPeak.app
 The app lives in the menu bar only (no Dock icon). To keep it around, copy it to
 `/Applications` and enable **Start at login** from its menu.
 
+## First launch: Gatekeeper warning
+
+The app is **ad-hoc signed but not notarized** (no paid Apple Developer ID).
+After downloading it – e.g. from a GitHub release – macOS may refuse to open it:
+
+> **"DeepSeekOffPeak.app" can't be opened because the developer cannot be
+> verified.**
+> (macOS Sequoia and newer: *"…can't be opened because its integrity cannot be
+> verified."*)
+
+This is **not a bug in the app**: downloaded files get a quarantine flag, and
+Gatekeeper only lets notarized apps through without a prompt. Unblock it once
+and it launches normally from then on:
+
+1. **Right-click → Open** in Finder, then confirm **Open** in the dialog.
+   macOS remembers this for future launches.
+   *Note:* on macOS Sequoia and newer this shortcut is sometimes no longer
+   offered for non-notarized apps — use option 2 or 3 instead.
+2. Double-click once and dismiss the warning. Then open **System Settings →
+   Privacy & Security** — at the bottom you'll find a note about the app with
+   an **"Open Anyway"** button. After that, a normal double-click works.
+3. **Terminal (removes the quarantine flag):**
+
+   ```bash
+   xattr -d com.apple.quarantine /Applications/DeepSeekOffPeak.app
+   # or, more generally, on the whole bundle:
+   xattr -cr /Applications/DeepSeekOffPeak.app
+   ```
+
+If you **build the app yourself** (`./build.sh`) you normally won't see the
+warning at all – locally built binaries don't carry a quarantine flag.
+
 ## Menu
 
 | Item | What it does |

@@ -210,6 +210,43 @@ open DeepSeekOffPeak/build/DeepSeekOffPeak.app
 Dauerhaft nutzen: die App nach `~/Applications` oder `/Applications` kopieren
 („Bei Anmeldung starten“ im Menü aktivieren).
 
+## Erster Start: Warnung von macOS (Gatekeeper)
+
+Die App ist **ad-hoc signiert, aber nicht notarisiert** (kein
+kostenpflichtiges Apple-Developer-Zertifikat). Beim ersten Start nach dem
+Download – etwa aus einem GitHub-Release – kann macOS deshalb melden:
+
+> **„DeepSeekOffPeak.app“ kann nicht geöffnet werden, da der Entwickler nicht
+> überprüft werden konnte.**
+> (macOS Sequoia und neuer formuliert: *„… kann nicht geöffnet werden, da
+> seine Integrität nicht überprüft werden kann.“*)
+
+Das ist **kein Fehler der App**: macOS versieht heruntergeladene Dateien mit
+einer Quarantäne-Markierung, und Gatekeeper lässt nur notarisierte Apps
+kommentarlos zu. Einmal beheben, danach startet die App ganz normal per
+Doppelklick:
+
+1. **Kontextmenü (klassischer Weg):** Die App im Finder mit **Rechtsklick
+   (bzw. Ctrl+Klick) → „Öffnen“** starten und im Dialog erneut „Öffnen“
+   wählen. Das merkt sich macOS für alle künftigen Starts.
+   *Hinweis:* Ab macOS Sequoia bietet Gatekeeper diesen Umweg bei nicht
+   notarisierten Apps manchmal nicht mehr an – dann Variante 2 oder 3 nutzen.
+2. **Systemeinstellungen:** App einmal normal per Doppelklick starten und den
+   Warn-Dialog mit „Fertig“ schließen. Dann **Systemeinstellungen →
+   Datenschutz & Sicherheit** öffnen – ganz unten steht der Hinweis auf die
+   App mit der Schaltfläche **„Dennoch öffnen“**. Danach startet sie normal.
+3. **Kommandozeile (entfernt die Quarantäne-Markierung):**
+
+   ```bash
+   xattr -d com.apple.quarantine /Applications/DeepSeekOffPeak.app
+   # oder pauschal über den ganzen Bundle:
+   xattr -cr /Applications/DeepSeekOffPeak.app
+   ```
+
+Wer die App **selbst kompiliert** (`./build.sh`), erhält die Warnung in der
+Regel **nicht** – lokal gebaute Binärdateien bekommen keine
+Quarantäne-Markierung.
+
 ## CLI
 
 Ohne GUI nutzbar (z. B. für Skripte oder dein `deepseek-cli`-Prompt):
@@ -237,7 +274,9 @@ DeepSeekOffPeak.app/Contents/MacOS/DeepSeekOffPeak --create-config   # Standard-
   Voraussetzung ist der Alias `deepseek` in `~/.bashrc`
   (z. B. `alias deepseek='npx @deepseek-ai/dsh web'`); fehlt er, startet das
   Skript `npx @deepseek-ai/dsh web` direkt.
-- App ist nicht notariell signiert – beim ersten Start ggf. Rechtsklick → „Öffnen“.
+- App ist ad-hoc signiert, aber nicht notarisiert – beim ersten Start nach dem
+  Download ggf. die macOS-Warnung ignorieren und einmalig freigeben
+  (siehe [Erster Start: Gatekeeper](#erster-start-warnung-von-macos-gatekeeper)).
 
 ## Lokalisierung
 
